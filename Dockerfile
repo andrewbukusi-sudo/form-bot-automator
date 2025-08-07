@@ -1,9 +1,8 @@
 FROM python:3.11-slim
 
-# Prevent prompts from popping up
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install required system packages
+# Install Chromium and ChromeDriver
 RUN apt-get update && apt-get install -y \
     chromium-driver \
     chromium \
@@ -12,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     && apt-get clean
 
-# Set environment variables for Chromium
+# Set environment variables for Selenium
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
@@ -20,9 +19,9 @@ ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy source code
+# Copy app files
 COPY . /app
 WORKDIR /app
 
-# Start the Flask server
+# Start the app
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
