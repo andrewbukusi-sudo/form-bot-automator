@@ -14,7 +14,7 @@ FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJ
 TOTAL_RESPONSES = 80
 
 # Random options
-age_options = ["Below 18", "18–24", "25–34"]
+age_options = ["Below 18", "18-24", "25-34"]
 gender_options = ["Male", "Female", "Prefer not to say"]
 education_levels = ["Secondary", "College/University", "Postgraduate"]
 frequency_options = ["Very often", "Often", "Sometimes", "Rarely", "Never"]
