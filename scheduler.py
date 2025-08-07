@@ -1,110 +1,96 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 import time
 import random
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 def submit_form():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode on Render
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform")
 
     try:
-        # Go to your actual Google Form URL
-        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform")
+        # Age
+        age_option = random.choice(["18–24", "25–34", "35–44", "45 and above"])
+        driver.find_element(By.XPATH, f'//div[@data-value="{age_option}"]').click()
+        time.sleep(0.5)
 
+        # Gender
+        gender_option = random.choice(["Male", "Female", "Prefer not to say"])
+        driver.find_element(By.XPATH, f'//div[@data-value="{gender_option}"]').click()
+        time.sleep(0.5)
 
-        # ---- 1. Age ----
-        age_options = ["18–24", "25–34", "35–44", "45 and above"]
-        age_choice = random.choice(age_options)
-        age_input = driver.find_element(By.XPATH, f'//input[@value="{age_choice}"]')
-        age_input.click()
-        time.sleep(1)
+        # Seen wildlife photos
+        seen_option = random.choice(["Yes", "No"])
+        driver.find_element(By.XPATH, f'//div[@data-value="{seen_option}"]').click()
+        time.sleep(0.5)
 
-        # ---- 2. Gender ----
-        gender_options = ["Male", "Female", "Prefer not to say"]
-        gender_choice = random.choice(gender_options)
-        gender_input = driver.find_element(By.XPATH, f'//input[@value="{gender_choice}"]')
-        gender_input.click()
-        time.sleep(1)
+        # Frequency (if Yes was selected)
+        if seen_option == "Yes":
+            freq_option = random.choice(["Very often", "Often", "Sometimes", "Rarely", "Never"])
+            driver.find_element(By.XPATH, f'//div[@data-value="{freq_option}"]').click()
+            time.sleep(0.5)
 
-        # ---- 3. Seen wildlife photos? ----
-        seen_options = ["Yes", "No"]
-        seen_choice = random.choice(seen_options)
-        seen_input = driver.find_element(By.XPATH, f'//input[@value="{seen_choice}"]')
-        seen_input.click()
-        time.sleep(1)
+        # Agreement with awareness impact
+        awareness_agreement = random.choice([
+            "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"
+        ])
+        driver.find_element(By.XPATH, f'//div[@data-value="{awareness_agreement}"]').click()
+        time.sleep(0.5)
 
-        # ---- 4. Frequency (only if "Yes") ----
-        if seen_choice == "Yes":
-            freq_options = ["Very often", "Often", "Sometimes", "Rarely", "Never"]
-            freq_choice = random.choice(freq_options)
-            freq_input = driver.find_element(By.XPATH, f'//input[@value="{freq_choice}"]')
-            freq_input.click()
-            time.sleep(1)
+        # Effectiveness scale (1–5)
+        effectiveness = str(random.randint(1, 5))
+        driver.find_element(By.XPATH, f'//div[@data-value="{effectiveness}"]').click()
+        time.sleep(0.5)
 
-        # ---- 5. Agree with awareness ----
-        agree_options = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
-        agree_choice = random.choice(agree_options)
-        agree_input = driver.find_element(By.XPATH, f'//input[@value="{agree_choice}"]')
-        agree_input.click()
-        time.sleep(1)
-
-        # ---- 6. Effectiveness scale (1–5) ----
-        effectiveness_options = ["Not effective", "1", "2", "3", "4", "5", "Highly effective"]
-        effectiveness_choice = random.choice(effectiveness_options)
-        effectiveness_input = driver.find_element(By.XPATH, f'//input[@value="{effectiveness_choice}"]')
-        effectiveness_input.click()
-        time.sleep(1)
-
-        # ---- 7. Platforms used (multiple select) ----
-        platform_options = [
+        # Platforms for photojournalism (checkboxes - random multiple)
+        platforms = [
             "Newspapers", "Magazines", "Social media",
             "Online news websites", "TV broadcasts", "Photography exhibitions"
         ]
-        selected_platforms = random.sample(platform_options, k=random.randint(1, 3))
+        selected_platforms = random.sample(platforms, k=random.randint(1, 3))
         for platform in selected_platforms:
-            platform_input = driver.find_element(By.XPATH, f'//input[@value="{platform}"]')
-            platform_input.click()
-            time.sleep(0.5)
+            driver.find_element(By.XPATH, f'//div[@data-value="{platform}"]').click()
+            time.sleep(0.3)
 
-        # ---- 8. Most impactful platform ----
-        impactful_choice = random.choice(platform_options)
-        impactful_input = driver.find_element(By.XPATH, f'//input[@value="{impactful_choice}"]')
-        impactful_input.click()
-        time.sleep(1)
+        # Most impactful platform (radio)
+        impactful_platform = random.choice(platforms)
+        driver.find_element(By.XPATH, f'//div[@data-value="{impactful_platform}"]').click()
+        time.sleep(0.5)
 
-        # ---- 9. Reaction to photo ----
-        reaction_options = [
+        # Reaction to wildlife photographs
+        reaction = random.choice([
             "Feel concerned but take no action",
             "Feel motivated to learn more",
             "Feel motivated to take action (e.g., donate, volunteer)",
             "No particular reaction"
-        ]
-        reaction_choice = random.choice(reaction_options)
-        reaction_input = driver.find_element(By.XPATH, f'//input[@value="{reaction_choice}"]')
-        reaction_input.click()
-        time.sleep(1)
+        ])
+        driver.find_element(By.XPATH, f'//div[@data-value="{reaction}"]').click()
+        time.sleep(0.5)
 
-        # ---- 10. Agree with support due to photographs ----
-        support_agree_choice = random.choice(agree_options)
-        support_input = driver.find_element(By.XPATH, f'//input[@value="{support_agree_choice}"]')
-        support_input.click()
-        time.sleep(1)
+        # Agreement with support for conservation
+        support_agreement = random.choice([
+            "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"
+        ])
+        driver.find_element(By.XPATH, f'//div[@data-value="{support_agreement}"]').click()
+        time.sleep(0.5)
 
-        # ---- Submit the form ----
-        submit_button = driver.find_element(By.XPATH, '//span[contains(text(), "Submit")]')
+        # Submit
+        submit_button = driver.find_element(By.XPATH, '//span[text()="Submit"]/ancestor::div[@role="button"]')
         submit_button.click()
-        time.sleep(2)
 
-        print("✅ Submitted form successfully.")
+        print("✅ Submitted successfully.")
 
     except Exception as e:
         print(f"❌ Error: {e}")
-
     finally:
         driver.quit()
+
+if __name__ == "__main__":
+    submit_form()
