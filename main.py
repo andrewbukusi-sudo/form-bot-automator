@@ -1,16 +1,12 @@
 from flask import Flask
-from scheduler import run_scheduler
+from scheduler import submit_form
 
 app = Flask(__name__)
 
 @app.route('/')
-def home():
-    return '✅ Form submission bot is running!'
-
-@app.route('/run')
-def run():
-    run_scheduler()
-    return '✅ Scheduler executed successfully.'
+def index():
+    submit_form()
+    return "✅ Form submission triggered!"
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
