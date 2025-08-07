@@ -68,6 +68,9 @@ def home():
 def manual_submit():
     submit_response()
     return "Submitted one response!"
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return f"❌ Internal Server Error: {e}", 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
