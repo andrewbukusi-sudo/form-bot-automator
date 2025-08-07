@@ -2,7 +2,7 @@ from flask import Flask
 import threading
 import random
 import time
-from form_bot import submit_form
+from submit import submit_form
 
 app = Flask(__name__)
 
