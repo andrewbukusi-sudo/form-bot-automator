@@ -1,19 +1,17 @@
-# Use an official Python runtime as a parent image
 FROM python:3.11-slim
 
-# Set environment variables
+# Environment settings
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install dependencies and tools
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget \
+    chromium \
+    chromium-driver \
     unzip \
     curl \
     gnupg \
     ca-certificates \
-    chromium \
-    chromium-driver \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -32,28 +30,21 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Download matching ChromeDriver for Chromium v139
-RUN wget https://storage.googleapis.com/chrome-for-testing-public/139.0.3623.0/linux64/chromedriver-linux64.zip && \
-    unzip chromedriver-linux64.zip && \
-    mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver && \
-    chmod +x /usr/local/bin/chromedriver && \
-    rm -rf chromedriver-linux64*
-
-# Set display port to avoid crash
+# Set environment variable to prevent crashes
 ENV DISPLAY=:99
 
-# Set working directory
+# Create and change to app directory
 WORKDIR /app
 
-# Install Python dependencies
+# Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Copy project files
+# Copy the rest of the application
 COPY . .
 
-# Expose the port the app runs on
+# Expose port for Render
 EXPOSE 5000
 
-# Run the app
+# Start the app with Gunicorn
 CMD ["gunicorn", "main:app", "--bind", "0.0.0.0:5000"]
