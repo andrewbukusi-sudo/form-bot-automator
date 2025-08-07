@@ -1,76 +1,62 @@
 import random
 import time
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 def submit_form():
-    # Setup Chrome options
+    url = "https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform"
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
 
-    # Tell Selenium where the correct ChromeDriver is
-    service = Service("/usr/local/bin/chromedriver")  # Use downloaded one that matches Chromium 139
-
-    # Launch browser
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
 
     try:
-        # Open your form
-        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform")
+        driver.get(url)
+        time.sleep(2)
 
-        time.sleep(3)
+        # AGE
+        age_options = [
+            "18–24", "25–34", "35–44", "45 and above"
+        ]
+        driver.find_element(By.XPATH, f'//div[@data-value="{random.choice(age_options)}"]').click()
 
-        # Select Age
-        age_options = ["18–24", "25–34", "35–44", "45 and above"]
-        age = random.choice(age_options)
-        age_xpath = f'//div[@data-value="{age}"]'
-        driver.find_element(By.XPATH, age_xpath).click()
-
-        # Select Gender
+        # GENDER
         gender_options = ["Male", "Female", "Prefer not to say"]
-        gender = random.choice(gender_options)
-        gender_xpath = f'//div[@data-value="{gender}"]'
-        driver.find_element(By.XPATH, gender_xpath).click()
+        driver.find_element(By.XPATH, f'//div[@data-value="{random.choice(gender_options)}"]').click()
 
-        # Seen wildlife photos
-        seen = random.choice(["Yes", "No"])
-        seen_xpath = f'//div[@data-value="{seen}"]'
-        driver.find_element(By.XPATH, seen_xpath).click()
+        # Seen wildlife photo
+        driver.find_element(By.XPATH, f'//div[@data-value="{random.choice(["Yes", "No"])}"]').click()
 
-        # Frequency (only if "Yes")
-        if seen == "Yes":
-            freq = random.choice(["Very often", "Often", "Sometimes", "Rarely", "Never"])
-            freq_xpath = f'//div[@data-value="{freq}"]'
-            driver.find_element(By.XPATH, freq_xpath).click()
+        # Frequency
+        freq = random.choice(["Very often", "Often", "Sometimes", "Rarely", "Never"])
+        driver.find_element(By.XPATH, f'//div[@data-value="{freq}"]').click()
 
         # Awareness from photojournalism
-        awareness = random.choice(["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"])
-        awareness_xpath = f'//div[@data-value="{awareness}"]'
-        driver.find_element(By.XPATH, awareness_xpath).click()
+        awareness = random.choice([
+            "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"
+        ])
+        driver.find_element(By.XPATH, f'//div[@data-value="{awareness}"]').click()
 
-        # Effectiveness scale (1–5)
-        effectiveness = str(random.randint(1, 5))
-        effectiveness_xpath = f'//div[@data-value="{effectiveness}"]'
-        driver.find_element(By.XPATH, effectiveness_xpath).click()
+        # Effectiveness scale 1–5
+        driver.find_element(By.XPATH, f'//div[@data-value="{str(random.randint(1,5))}"]').click()
 
-        # Platforms (multi-choice)
-        platform_options = [
+        # Platforms (multiple choice)
+        platforms = [
             "Newspapers", "Magazines", "Social media", 
             "Online news websites", "TV broadcasts", "Photography exhibitions"
         ]
-        selected_platforms = random.sample(platform_options, random.randint(1, 3))
-        for platform in selected_platforms:
-            xpath = f'//div[@data-value="{platform}"]'
-            driver.find_element(By.XPATH, xpath).click()
+        random.shuffle(platforms)
+        for platform in platforms[:random.randint(1, 4)]:
+            driver.find_element(By.XPATH, f'//div[@data-value="{platform}"]').click()
 
-        # Most impactful
-        impactful = random.choice(platform_options)
-        impactful_xpath = f'//div[@data-value="{impactful}"]'
-        driver.find_element(By.XPATH, impactful_xpath).click()
+        # Most impactful platform (single)
+        impactful = random.choice(platforms)
+        driver.find_element(By.XPATH, f'//div[@data-value="{impactful}"]').click()
 
         # Reaction
         reaction = random.choice([
@@ -79,20 +65,22 @@ def submit_form():
             "Feel motivated to take action (e.g., donate, volunteer)",
             "No particular reaction"
         ])
-        reaction_xpath = f'//div[@data-value="{reaction}"]'
-        driver.find_element(By.XPATH, reaction_xpath).click()
+        driver.find_element(By.XPATH, f'//div[@data-value="{reaction}"]').click()
 
-        # Support for conservation
-        support = random.choice(["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"])
-        support_xpath = f'//div[@data-value="{support}"]'
-        driver.find_element(By.XPATH, support_xpath).click()
+        # Support conservation from photos
+        support = random.choice([
+            "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"
+        ])
+        driver.find_element(By.XPATH, f'//div[@data-value="{support}"]').click()
 
         # Submit
-        submit_btn = driver.find_element(By.XPATH, '//span[text()="Submit"]/ancestor::div[@role="button"]')
+        submit_btn = driver.find_element(By.XPATH, '//span[contains(text(),"Submit")]/ancestor::div[@role="button"]')
         submit_btn.click()
 
-        print("✅ Form submitted.")
+        print("✅ Submitted form successfully")
+
     except Exception as e:
         print("❌ Error:", e)
+
     finally:
         driver.quit()
