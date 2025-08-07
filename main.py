@@ -2,7 +2,7 @@ from flask import Flask
 import threading
 import random
 import time
-from submit import submit_form
+from scheduler import submit_form
 
 app = Flask(__name__)
 
