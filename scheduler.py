@@ -1,55 +1,62 @@
-import random
-import time
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+import time
 
 def submit_form():
+    url = "https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform"
+
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    driver.get(url)
+    time.sleep(2)
+
     try:
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
+        # Select Age
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="18–24"]]').click()
 
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
-        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform")
+        # Select Gender
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Male"]]').click()
 
-        time.sleep(3)
+        # Seen conservation photos?
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Yes"]]').click()
 
-        # Random choices for each question
-        age_options = ["18–24", "25–34", "35–44", "45 and above"]
-        gender_options = ["Male", "Female", "Prefer not to say"]
-        seen_photos = ["Yes", "No"]
-        frequency = ["Very often", "Often", "Sometimes", "Rarely", "Never"]
-        awareness = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"]
-        effectiveness = ["1", "2", "3", "4", "5"]
-        platforms = ["Newspapers", "Magazines", "Social media", "Online news websites", "TV broadcasts", "Photography exhibitions"]
-        reactions = ["Feel concerned but take no action", "Feel motivated to learn more", "Feel motivated to take action (e.g., donate, volunteer)", "No particular reaction"]
+        # Frequency of seeing such photos
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Often"]]').click()
 
-        # Fill each field by visible text
-        def click_option(value):
-            xpath = f'//div[@role="listitem"]//span[contains(text(), "{value}")]'
-            element = driver.find_element(By.XPATH, xpath)
-            element.click()
+        # Agreement: awareness
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Agree"]]').click()
 
-        click_option(random.choice(age_options))
-        click_option(random.choice(gender_options))
-        click_option(random.choice(seen_photos))
-        click_option(random.choice(frequency))
-        click_option(random.choice(awareness))
-        click_option(random.choice(effectiveness))
-        click_option(random.choice(platforms))  # multiple choice platform
-        click_option(random.choice(platforms))  # most impactful platform
-        click_option(random.choice(reactions))
-        click_option(random.choice(awareness))  # willingness to support
+        # Effectiveness scale: 5
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="5"]]').click()
 
-        # Submit the form
-        submit_button = driver.find_element(By.XPATH, '//span[contains(text(), "Submit")]/ancestor::div[@role="button"]')
-        submit_button.click()
+        # Platforms seen on
+        driver.find_element(By.XPATH, '//div[@role="checkbox" and .//div[text()="Social media"]]').click()
 
-        print("✅ Form submitted.")
-        driver.quit()
+        # Most impactful platform
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Photography exhibitions"]]').click()
+
+        # Reaction to photos
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Feel concerned but take no action"]]').click()
+
+        # Agreement: support
+        driver.find_element(By.XPATH, '//div[@role="radio" and .//div[text()="Strongly agree"]]').click()
+
+        # Submit form
+        driver.find_element(By.XPATH, '//span[text()="Submit"]').click()
+
+        time.sleep(2)
+        print("✅ Form submitted")
 
     except Exception as e:
         print(f"❌ Error: {e}")
+
+    driver.quit()
