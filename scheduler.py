@@ -15,8 +15,8 @@ def submit_form():
 
     try:
         # Go to your actual Google Form URL
-        driver.get("https://docs.google.com/forms/d/e/your-form-id/viewform")
-        time.sleep(3)
+        driver.get("https://docs.google.com/forms/d/e/1FAIpQLSfLijis5Y40ribPKLDwocm8EnfJXYyPATrU-G9i07AzHBqsAw/viewform")
+
 
         # ---- 1. Age ----
         age_options = ["18–24", "25–34", "35–44", "45 and above"]
